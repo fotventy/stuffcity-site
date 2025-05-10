@@ -1,0 +1,6 @@
+# Allow all robots to index the site
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://xn--80aqa7abedna.xn--p1ai/sitemap.xml 

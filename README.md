@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# СтаффСити - Сайт агентства по предоставлению B2B-персонала
 
-## Getting Started
+Современный, отзывчивый веб-сайт для компании "СтаффСити", специализирующейся на предоставлении квалифицированных рабочих кадров для строительных, производственных и логистических компаний в формате B2B.
 
-First, run the development server:
+## Технологии
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js 14** - React-фреймворк с серверными компонентами и маршрутизацией на основе файловой системы
+- **TypeScript** - Типизированный JavaScript для более надежной кодовой базы
+- **Tailwind CSS** - Утилитарный CSS-фреймворк для быстрой стилизации
+- **React Hooks** - Функциональные компоненты с состояниями и эффектами
+- **API Routes** - Серверные эндпоинты для обработки форм и взаимодействия с клиентом
+
+## Функциональность сайта
+
+- Адаптивный дизайн для всех устройств (мобильные, планшеты, десктоп)
+- Современный интерфейс с анимациями и плавными переходами
+- Каталог профессий с подробными страницами для каждой специальности
+- Функциональная контактная форма с валидацией
+- SEO-оптимизация, включая метаданные, sitemap и robots.txt
+- Оптимизированные изображения и быстрая загрузка
+
+## Структура проекта
+
+```
+src/
+├── app/                   # Основные страницы и макеты (Next.js App Router)
+│   ├── page.tsx           # Главная страница
+│   ├── about/             # Страница "О компании"
+│   ├── professions/       # Каталог профессий и детальные страницы
+│   └── contacts/          # Страница контактов
+├── components/            # Переиспользуемые компоненты React
+│   ├── Footer.tsx         # Подвал сайта
+│   ├── Header.tsx         # Заголовок сайта
+│   ├── Hero.tsx           # Баннер главной страницы
+│   └── NewsletterSignup.tsx # Форма подписки на новости
+├── data/                  # Данные приложения
+│   └── professions.ts     # Информация о профессиях
+└── api/                   # API-маршруты для обработки форм
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Запуск проекта
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Предварительные требования
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 18.17 или выше
+- npm (или yarn/pnpm)
 
-## Learn More
+### Установка и запуск
 
-To learn more about Next.js, take a look at the following resources:
+1. Клонировать репозиторий:
+```bash
+git clone https://github.com/yourname/stuffcity-site.git
+cd stuffcity-site
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Установить зависимости:
+```bash
+npm install
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Запустить сервер разработки:
+```bash
+npm run dev
+```
 
-## Deploy on Vercel
+4. Открыть [http://localhost:3000](http://localhost:3000) в браузере.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Сборка для продакшена
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build
+npm run start
+```
+
+## Возможные улучшения
+
+- Интеграция с CMS для управления контентом
+- Добавление блога с статьями о рынке труда и услугах компании
+- Интеграция с CRM-системой для автоматизации обработки заявок
+- Многоязычная поддержка
+- Добавление расширенной аналитики и отслеживания конверсий
