@@ -62,21 +62,14 @@ export default function Hero() {
             
             <div className="flex flex-wrap items-center gap-6 pt-6">
               <div className="flex -space-x-4">
-                <div className="w-10 h-10 rounded-full bg-white border-2 border-black flex items-center justify-center overflow-hidden">
-                  <img src={`${basePath}/images/leroy-merlin.svg`} alt="Leroy Merlin" className="object-contain w-8 h-8" />
-                </div>
-                <div className="w-10 h-10 rounded-full bg-white border-2 border-black flex items-center justify-center text-xs font-bold text-black" style={{background: 'linear-gradient(135deg, #1e3a8a 60%, #fff 100%)'}}>
-                  СДС
-                </div>
-                <div className="w-10 h-10 rounded-full bg-white border-2 border-black flex items-center justify-center text-xs font-bold text-black" style={{background: 'linear-gradient(135deg, #f59e42 60%, #fff 100%)'}}>
-                  ГЗК
-                </div>
-                <div className="w-10 h-10 rounded-full bg-white border-2 border-black flex items-center justify-center text-xs font-bold text-black" style={{background: 'linear-gradient(135deg, #d32f2f 60%, #fff 100%)'}}>
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#d32f2f"/><text x="10" y="15" text-anchor="middle" font-size="10" fill="#fff" font-family="Arial, Helvetica, sans-serif">М</text></svg>
-                </div>
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="w-10 h-10 rounded-full bg-orange-500/80 border-2 border-black flex items-center justify-center text-black font-bold text-xs">
+                    {i}
+                  </div>
+                ))}
               </div>
               <p className="text-orange-100/80 text-sm">
-                Лучшие компании выбирают нас
+                <span className="text-orange-500 font-semibold">Лучшие компании</span> выбирают нас
               </p>
             </div>
           </div>
