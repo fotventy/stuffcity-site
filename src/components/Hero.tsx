@@ -5,7 +5,6 @@ import { useState } from "react";
 
 export default function Hero() {
   const [imgError, setImgError] = useState(false);
-  const basePath = '/stuffcity-site';
   
   return (
     <section className="relative min-h-screen flex items-center">
@@ -13,7 +12,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-0">
         {!imgError ? (
           <img 
-            src={`${basePath}/images/hero-bg.jpg`} 
+            src="/images/hero-bg.jpg" 
             alt="СтаффСити - Профессиональные кадры для вашего бизнеса" 
             className="object-cover object-center w-full h-full absolute inset-0" 
             onError={() => setImgError(true)}
@@ -29,7 +28,7 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <img 
-              src={`${basePath}/images/logo-staffcity.svg`} 
+              src="/images/logo-staffcity.svg" 
               alt="СтаффСити" 
               width={100} 
               height={100} 
