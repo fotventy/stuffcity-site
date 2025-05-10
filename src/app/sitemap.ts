@@ -36,7 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const professionPages = professionsData.map((profession) => ({
     url: `${baseUrl}/professions/${profession.slug}`,
     lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
+    changeFrequency: 'monthly',
     priority: 0.7,
   }));
   
