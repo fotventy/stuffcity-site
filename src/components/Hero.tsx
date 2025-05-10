@@ -68,7 +68,7 @@ export default function Hero() {
                 ))}
               </div>
               <p className="text-orange-100/80 text-sm">
-                <span className="text-orange-500 font-semibold">Лучшие компании</span> выбирают нас
+                <span className="text-orange-500 font-semibold">1000+</span> компаний уже выбрали нас
               </p>
             </div>
           </div>
