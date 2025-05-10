@@ -4,8 +4,15 @@ import { professionsData } from '@/data/professions';
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://стаффсити.рф';
   
+  type SitemapEntry = {
+    url: string;
+    lastModified: Date;
+    changeFrequency: "weekly" | "monthly" | "always" | "hourly" | "daily" | "yearly" | "never";
+    priority: number;
+  };
+  
   // Основные страницы
-  const staticPages = [
+  const staticPages: SitemapEntry[] = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -33,7 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
   
   // Страницы профессий
-  const professionPages = professionsData.map((profession) => ({
+  const professionPages: SitemapEntry[] = professionsData.map((profession) => ({
     url: `${baseUrl}/professions/${profession.slug}`,
     lastModified: new Date(),
     changeFrequency: 'monthly',
