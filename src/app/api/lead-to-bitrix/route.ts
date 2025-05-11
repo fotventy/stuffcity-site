@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const message = formData.get('message') as string;
     
     // Валидация данных
-    if (!name || !email || !phone) {
+    if (!name || !phone) {
       return Response.json(
         { success: false, message: 'Не все обязательные поля заполнены' },
         { status: 400 }
@@ -26,7 +26,6 @@ export async function POST(request: Request) {
         TITLE: `Заявка с сайта от ${name}`,
         NAME: name,
         COMPANY_TITLE: company || '',
-        EMAIL: [{ VALUE: email, VALUE_TYPE: 'WORK' }],
         PHONE: [{ VALUE: phone, VALUE_TYPE: 'WORK' }],
         COMMENTS: `Услуга: ${service || 'Не указана'}\n\nСообщение: ${message || 'Не указано'}`,
         SOURCE_ID: 'WEB',
@@ -37,6 +36,11 @@ export async function POST(request: Request) {
         REGISTER_SONET_EVENT: 'Y'
       }
     };
+    
+    // Добавляем email только если он указан
+    if (email) {
+      bitrixData.fields.EMAIL = [{ VALUE: email, VALUE_TYPE: 'WORK' }];
+    }
     
     // Отправляем данные в Bitrix24
     const bitrixResponse = await fetch(BITRIX_WEBHOOK_URL, {

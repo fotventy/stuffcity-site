@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 
 export default function LeadCapture() {
   const [isVisible, setIsVisible] = useState(false);
-  const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
@@ -67,7 +66,6 @@ export default function LeadCapture() {
     try {
       const formData = new FormData();
       formData.append('name', name);
-      formData.append('email', email);
       formData.append('phone', phone);
       formData.append('company', company);
       formData.append('service', 'Всплывающая форма');
@@ -149,19 +147,6 @@ export default function LeadCapture() {
                 </div>
                 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-orange-100/80 mb-1">Email</label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2 border border-orange-500/30 bg-black/50 rounded focus:outline-none focus:ring-1 focus:ring-orange-500 text-orange-100"
-                    placeholder="email@example.com"
-                    required
-                  />
-                </div>
-                
-                <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-orange-100/80 mb-1">Телефон</label>
                   <input
                     id="phone"
@@ -170,6 +155,7 @@ export default function LeadCapture() {
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full px-3 py-2 border border-orange-500/30 bg-black/50 rounded focus:outline-none focus:ring-1 focus:ring-orange-500 text-orange-100"
                     placeholder="+7 (900) 123-45-67"
+                    required
                   />
                 </div>
                 
