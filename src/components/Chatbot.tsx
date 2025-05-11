@@ -9,6 +9,41 @@ type Message = {
   timestamp: Date;
 };
 
+type FormData = {
+  name: string;
+  phone: string;
+  company: string;
+  service: string;
+  message: string;
+};
+
+// Этапы диалога для сбора данных
+enum DialogStage {
+  GREETING,
+  ASK_NAME,
+  ASK_PHONE,
+  ASK_COMPANY,
+  ASK_SERVICE,
+  ASK_MESSAGE,
+  CONFIRM_SUBMISSION,
+  THANK_YOU,
+  FREE_CHAT
+}
+
+// Доступные услуги
+const availableServices = [
+  "Разнорабочие",
+  "Грузчики",
+  "Такелажники",
+  "Монтажники",
+  "Монолитчики",
+  "Сварщики",
+  "Сантехники",
+  "Отделочники",
+  "Другое"
+];
+
+// Часто задаваемые вопросы
 const commonQuestions = [
   "Как быстро можно получить сотрудников?",
   "Какие специальности доступны?",
@@ -22,6 +57,16 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [showTyping, setShowTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [dialogStage, setDialogStage] = useState<DialogStage>(DialogStage.GREETING);
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    phone: "",
+    company: "",
+    service: "",
+    message: ""
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [showServiceButtons, setShowServiceButtons] = useState(false);
   
   // Показываем чат-бот через некоторое время после загрузки страницы
   useEffect(() => {
@@ -33,8 +78,9 @@ export default function Chatbot() {
         sessionStorage.setItem("chatShown", "true");
         
         // Отправляем приветственное сообщение
-        handleBotReply("Здравствуйте! Меня зовут Алекс, я виртуальный помощник СтаффСити. Как я могу вам помочь сегодня?");
-      }, 20000); // 20 секунд
+        handleBotReply("Здравствуйте! Меня зовут Алекс, я виртуальный помощник СтаффСити. Готов помочь вам с подбором персонала для вашего бизнеса. Как я могу к вам обращаться?");
+        setDialogStage(DialogStage.ASK_NAME);
+      }, 15000); // 15 секунд
       
       return () => clearTimeout(timer);
     }
@@ -43,6 +89,93 @@ export default function Chatbot() {
   // Прокрутка к последнему сообщению
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Обработка ответа пользователя в зависимости от стадии диалога
+  useEffect(() => {
+    if (messages.length === 0 || messages[messages.length - 1].sender === 'bot') return;
+    
+    const lastUserMessage = messages[messages.length - 1].text;
+    
+    switch (dialogStage) {
+      case DialogStage.ASK_NAME:
+        if (lastUserMessage.length > 1) {
+          setFormData(prev => ({ ...prev, name: lastUserMessage }));
+          setTimeout(() => {
+            handleBotReply(`Приятно познакомиться, ${lastUserMessage}! Для того чтобы мы могли с вами связаться, оставьте, пожалуйста, номер телефона.`);
+            setDialogStage(DialogStage.ASK_PHONE);
+          }, 1000);
+        } else {
+          handleBotReply("Кажется, ваше имя слишком короткое. Пожалуйста, укажите ваше полное имя.");
+        }
+        break;
+        
+      case DialogStage.ASK_PHONE:
+        // Простая валидация телефона (можно улучшить)
+        if (lastUserMessage.length >= 7 && /\d/.test(lastUserMessage)) {
+          setFormData(prev => ({ ...prev, phone: lastUserMessage }));
+          setTimeout(() => {
+            handleBotReply("Отлично! Укажите, пожалуйста, название вашей компании. Если вы частное лицо, просто напишите 'Частное лицо'.");
+            setDialogStage(DialogStage.ASK_COMPANY);
+          }, 1000);
+        } else {
+          handleBotReply("Номер телефона выглядит некорректным. Пожалуйста, укажите действующий номер телефона.");
+        }
+        break;
+        
+      case DialogStage.ASK_COMPANY:
+        setFormData(prev => ({ ...prev, company: lastUserMessage }));
+        setTimeout(() => {
+          handleBotReply("Какой тип персонала вас интересует? Выберите из списка или укажите свой вариант.");
+          setShowServiceButtons(true);
+          setDialogStage(DialogStage.ASK_SERVICE);
+        }, 1000);
+        break;
+        
+      case DialogStage.ASK_SERVICE:
+        setFormData(prev => ({ ...prev, service: lastUserMessage }));
+        setShowServiceButtons(false);
+        setTimeout(() => {
+          handleBotReply("Расскажите подробнее о вашем проекте или задаче. Какой объем работы, сроки, особые требования?");
+          setDialogStage(DialogStage.ASK_MESSAGE);
+        }, 1000);
+        break;
+        
+      case DialogStage.ASK_MESSAGE:
+        setFormData(prev => ({ ...prev, message: lastUserMessage }));
+        setTimeout(() => {
+          const summary = 
+            `Отлично, ${formData.name}! Я подготовил заявку со следующими данными:\n\n` +
+            `Имя: ${formData.name}\n` +
+            `Телефон: ${formData.phone}\n` +
+            `Компания: ${formData.company}\n` +
+            `Интересующая услуга: ${formData.service}\n` +
+            `Сообщение: ${lastUserMessage}\n\n` +
+            `Всё верно? Могу отправить заявку нашему менеджеру, и он свяжется с вами в ближайшее время.`;
+          
+          handleBotReply(summary);
+          setDialogStage(DialogStage.CONFIRM_SUBMISSION);
+        }, 1500);
+        break;
+        
+      case DialogStage.CONFIRM_SUBMISSION:
+        const response = lastUserMessage.toLowerCase();
+        if (response.includes('да') || response.includes('верно') || response.includes('отправить')) {
+          submitForm();
+        } else {
+          handleBotReply("Хорошо, давайте исправим данные. Напишите, что именно нужно изменить, или просто задайте любой вопрос, и я постараюсь помочь.");
+          setDialogStage(DialogStage.FREE_CHAT);
+        }
+        break;
+        
+      case DialogStage.FREE_CHAT:
+        handleUserQuestion(lastUserMessage);
+        break;
+        
+      default:
+        handleUserQuestion(lastUserMessage);
+        break;
+    }
   }, [messages]);
   
   const handleBotReply = (text: string) => {
@@ -78,27 +211,6 @@ export default function Chatbot() {
     ]);
     
     setInput("");
-    
-    // Генерируем ответ бота в зависимости от запроса
-    const userInput = input.toLowerCase();
-    let botResponse = "";
-    
-    if (userInput.includes("привет") || userInput.includes("здравствуй")) {
-      botResponse = "Здравствуйте! Чем я могу вам помочь?";
-    } else if (userInput.includes("цен") || userInput.includes("стоимость") || userInput.includes("стоит")) {
-      botResponse = "Стоимость наших услуг зависит от специализации и количества требуемых сотрудников. Оставьте заявку на консультацию, и наш менеджер рассчитает для вас индивидуальное предложение.";
-    } else if (userInput.includes("быстро") || userInput.includes("срок")) {
-      botResponse = "Мы можем предоставить сотрудников в течение 24-48 часов после подписания договора. В некоторых случаях возможна более быстрая организация.";
-    } else if (userInput.includes("контакт") || userInput.includes("телефон") || userInput.includes("связаться")) {
-      botResponse = "Вы можете связаться с нами по телефону +7 (999) 123-45-67 или оставить заявку на сайте, и наш менеджер свяжется с вами.";
-    } else if (userInput.includes("специальност") || userInput.includes("профессии") || userInput.includes("работник")) {
-      botResponse = "Мы предоставляем сотрудников различных строительных и производственных специальностей: разнорабочие, грузчики, монтажники, сварщики и многие другие. Полный список вы можете посмотреть в разделе 'Профессии'.";
-    } else {
-      botResponse = "Спасибо за ваш запрос! Для получения более детальной информации я рекомендую оставить заявку на консультацию или связаться с нашими специалистами по телефону.";
-    }
-    
-    // Имитируем ответ от бота
-    handleBotReply(botResponse);
   };
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -110,6 +222,46 @@ export default function Chatbot() {
   
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+  
+  const handleServiceSelect = (service: string) => {
+    setMessages(prev => [
+      ...prev,
+      {
+        id: Date.now(),
+        text: service,
+        sender: "user",
+        timestamp: new Date()
+      }
+    ]);
+    
+    setShowServiceButtons(false);
+  };
+  
+  const handleUserQuestion = (userInput: string) => {
+    const lowerInput = userInput.toLowerCase();
+    let botResponse = "";
+    
+    // Обработка ключевых слов и фраз
+    if (lowerInput.includes('заявк') || lowerInput.includes('оформить') || lowerInput.includes('заказать')) {
+      botResponse = `${formData.name}, готов помочь вам оформить заявку! Давайте заполним небольшую форму. Как вас зовут?`;
+      setDialogStage(DialogStage.ASK_NAME);
+    } else if (lowerInput.includes('цен') || lowerInput.includes('стоимость') || lowerInput.includes('стоит')) {
+      botResponse = "Стоимость наших услуг зависит от специализации и количества требуемых сотрудников. Оставьте заявку на консультацию, и наш менеджер рассчитает для вас индивидуальное предложение. Хотите оформить заявку?";
+    } else if (lowerInput.includes('быстро') || lowerInput.includes('срок')) {
+      botResponse = "Мы можем предоставить сотрудников в течение 24-48 часов после подписания договора. В некоторых случаях возможна более быстрая организация. Хотите оставить заявку?";
+    } else if (lowerInput.includes('контакт') || lowerInput.includes('телефон') || lowerInput.includes('связаться')) {
+      botResponse = "Вы можете связаться с нами по телефону +7 967 246 19 08 или оставить заявку прямо здесь, и наш менеджер свяжется с вами. Хотите оформить заявку?";
+    } else if (lowerInput.includes('специальност') || lowerInput.includes('профессии') || lowerInput.includes('работник')) {
+      botResponse = "Мы предоставляем сотрудников различных строительных и производственных специальностей: разнорабочие, грузчики, монтажники, сварщики, монолитчики, сантехники, отделочники и многие другие. Какая специальность вас интересует?";
+    } else if (lowerInput.includes('привет') || lowerInput.includes('здравствуй')) {
+      botResponse = `Здравствуйте${formData.name ? ', ' + formData.name : ''}! Чем я могу вам помочь? Могу рассказать о наших услугах или помочь оформить заявку.`;
+    } else {
+      botResponse = "Спасибо за ваш запрос! Для получения более детальной информации я рекомендую оставить заявку на консультацию с нашим специалистом. Поможете заполнить короткую форму?";
+    }
+    
+    // Имитируем ответ от бота
+    handleBotReply(botResponse);
   };
   
   const handleQuickQuestion = (question: string) => {
@@ -127,15 +279,55 @@ export default function Chatbot() {
     // Имитируем ответ бота
     setTimeout(() => {
       if (question === "Как быстро можно получить сотрудников?") {
-        handleBotReply("Мы можем организовать команду в течение 24-48 часов после подписания договора.");
+        handleBotReply("Мы можем организовать команду в течение 24-48 часов после подписания договора. Хотите оставить заявку, чтобы наш менеджер связался с вами?");
       } else if (question === "Какие специальности доступны?") {
-        handleBotReply("Мы предоставляем разнорабочих, грузчиков, монтажников, сварщиков, монолитчиков и многих других. Подробный список вы найдете в разделе 'Профессии'.");
+        handleBotReply("Мы предоставляем разнорабочих, грузчиков, монтажников, сварщиков, монолитчиков, сантехников, отделочников и многих других. Какая специальность вас интересует?");
       } else if (question === "Сколько стоят ваши услуги?") {
-        handleBotReply("Стоимость зависит от специальности и объема работ. Оставьте заявку на консультацию для расчета индивидуального предложения.");
+        handleBotReply("Стоимость зависит от специальности и объема работ. Оставьте заявку на консультацию для расчета индивидуального предложения. Поможете заполнить форму?");
       } else if (question === "Работаете ли вы с юридическими лицами?") {
-        handleBotReply("Да, мы специализируемся на работе именно с юридическими лицами по договору B2B.");
+        handleBotReply("Да, мы специализируемся на работе именно с юридическими лицами по договору B2B. Какой персонал вам требуется?");
       }
     }, 500);
+  };
+  
+  const submitForm = async () => {
+    setSubmitting(true);
+    handleBotReply("Отправляю вашу заявку...");
+    
+    try {
+      const formDataObj = new FormData();
+      formDataObj.append('name', formData.name);
+      formDataObj.append('phone', formData.phone);
+      formDataObj.append('company', formData.company);
+      formDataObj.append('service', formData.service);
+      formDataObj.append('message', formData.message);
+      
+      const response = await fetch("/api/lead-to-bitrix", {
+        method: "POST",
+        body: formDataObj,
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        handleBotReply(`Отлично, ${formData.name}! Ваша заявка успешно отправлена. Наш менеджер свяжется с вами в ближайшее время по телефону ${formData.phone}.`);
+        setDialogStage(DialogStage.THANK_YOU);
+        
+        setTimeout(() => {
+          handleBotReply("Если у вас возникнут дополнительные вопросы, не стесняйтесь спрашивать. Я всегда готов помочь!");
+          setDialogStage(DialogStage.FREE_CHAT);
+        }, 3000);
+      } else {
+        handleBotReply("К сожалению, произошла ошибка при отправке заявки. Пожалуйста, проверьте данные и попробуйте снова или свяжитесь с нами по телефону +7 967 246 19 08.");
+        setDialogStage(DialogStage.FREE_CHAT);
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
+      handleBotReply("Возникла техническая проблема при отправке заявки. Пожалуйста, свяжитесь с нами по телефону +7 967 246 19 08.");
+      setDialogStage(DialogStage.FREE_CHAT);
+    } finally {
+      setSubmitting(false);
+    }
   };
   
   if (!isOpen) {
@@ -188,7 +380,7 @@ export default function Chatbot() {
               </svg>
             </div>
             <h4 className="text-orange-500 font-bold text-lg mb-2">Онлайн-консультант</h4>
-            <p className="text-orange-100/80 text-sm">Задайте вопрос, и наш консультант ответит вам в ближайшее время</p>
+            <p className="text-orange-100/80 text-sm">Я помогу вам подобрать персонал для вашего бизнеса</p>
             
             <div className="mt-4 w-full">
               <h5 className="text-sm font-medium text-orange-500 mb-2">Часто задаваемые вопросы:</h5>
@@ -229,6 +421,22 @@ export default function Chatbot() {
           </div>
         ))}
         
+        {showServiceButtons && (
+          <div className="mb-3">
+            <div className="flex flex-wrap gap-2 justify-center">
+              {availableServices.map((service, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleServiceSelect(service)}
+                  className="bg-orange-500/80 text-black px-3 py-1 rounded text-sm hover:bg-orange-500 transition-colors"
+                >
+                  {service}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        
         {showTyping && (
           <div className="mb-3 flex justify-start">
             <div className="bg-black/40 text-orange-100 rounded-lg rounded-bl-none p-3">
@@ -254,17 +462,25 @@ export default function Chatbot() {
             placeholder="Введите сообщение..."
             className="flex-1 px-3 py-2 bg-black/50 border border-orange-500/30 rounded-l focus:outline-none focus:ring-1 focus:ring-orange-500 text-orange-100 resize-none h-10 max-h-24"
             rows={1}
+            disabled={submitting}
           />
           <button
             onClick={handleSendMessage}
-            disabled={!input.trim()}
+            disabled={!input.trim() || submitting}
             className={`bg-orange-500 px-3 rounded-r flex items-center justify-center ${
-              !input.trim() ? "opacity-50 cursor-not-allowed" : "hover:bg-orange-600"
+              !input.trim() || submitting ? "opacity-50 cursor-not-allowed" : "hover:bg-orange-600"
             }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
+            {submitting ? (
+              <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            )}
           </button>
         </div>
       </div>
