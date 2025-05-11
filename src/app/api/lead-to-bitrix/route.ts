@@ -21,7 +21,22 @@ export async function POST(request: Request) {
     }
     
     // Формируем данные для Bitrix24
-    const bitrixData = {
+    const bitrixData: {
+      fields: {
+        TITLE: string;
+        NAME: string;
+        COMPANY_TITLE: string;
+        PHONE: { VALUE: string; VALUE_TYPE: string }[];
+        COMMENTS: string;
+        SOURCE_ID: string;
+        SOURCE_DESCRIPTION: string;
+        ASSIGNED_BY_ID: number;
+        EMAIL?: { VALUE: string; VALUE_TYPE: string }[];
+      },
+      params: {
+        REGISTER_SONET_EVENT: string
+      }
+    } = {
       fields: {
         TITLE: `Заявка с сайта от ${name}`,
         NAME: name,
