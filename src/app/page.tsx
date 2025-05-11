@@ -58,41 +58,78 @@ export default function Home() {
       {/* Advantages Section */}
       <section className="w-full bg-gradient-to-r from-orange-950/30 to-black py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-bold text-orange-500 text-center mb-12">Преимущества сотрудничества</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-orange-500 text-center mb-8">Преимущества аутсорсинга линейного персонала</h2>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
             <div className="bg-black/30 border-l-4 border-orange-500 p-6 rounded shadow-lg">
-              <h3 className="text-xl font-bold text-orange-400 mb-4">Профессионализм</h3>
-              <ul className="list-disc ml-6 text-orange-100/90 space-y-2">
-                <li>Тщательный отбор специалистов</li>
-                <li>Проверка квалификации и опыта</li>
-                <li>Регулярная аттестация персонала</li>
-                <li>Соблюдение стандартов качества</li>
-                <li>Обучение технике безопасности</li>
-              </ul>
+              <h3 className="text-xl font-bold text-orange-400 mb-4">1. Снижение затрат</h3>
+              <p className="text-orange-100/90 mb-4">
+                Аутсорсинг позволяет сократить расходы на зарплаты, налоги и другие обязательные
+                выплаты. Мы берем на себя все расходы, связанные с управлением персоналом.
+              </p>
+              
+              <div className="bg-orange-950/20 p-4 rounded mb-4">
+                <h4 className="font-bold text-orange-300 mb-2">Пример расходов при найме сотрудника:</h4>
+                <ul className="list-disc ml-6 text-orange-100/90 space-y-2">
+                  <li>Оклад сотрудника: 150 000 рублей</li>
+                  <li>Страховые взносы (30%): 45 000 рублей</li>
+                  <li>Зарплатный проект: 5 000 рублей</li>
+                  <li>Банковские комиссии: 1 500 рублей</li>
+                  <li>Реклама вакансий: 10 000 рублей</li>
+                  <li>Зарплата HR-менеджера: 100 000 рублей</li>
+                  <li>Спецодежда: 10 000 рублей</li>
+                  <li>Оплата больничных и отпускных</li>
+                </ul>
+                <p className="text-orange-300 font-bold mt-4">Средняя сумма затрат на сотрудника: 250 000 руб.</p>
+              </div>
+              
+              <div className="bg-orange-500/20 p-4 rounded">
+                <p className="font-bold text-orange-300 text-center">Все эти затраты включены в нашу стоимость!</p>
+                <p className="font-bold text-orange-300 text-center mt-2">Ваша экономия – до 30% затрат на сотрудника!</p>
+              </div>
             </div>
             
-            <div className="bg-black/30 border-l-4 border-orange-500 p-6 rounded shadow-lg">
-              <h3 className="text-xl font-bold text-orange-400 mb-4">Экономическая эффективность</h3>
-              <ul className="list-disc ml-6 text-orange-100/90 space-y-2">
-                <li>Оптимизация затрат на персонал</li>
-                <li>Отсутствие расходов на найм и обучение</li>
-                <li>Сокращение административных издержек</li>
-                <li>Фиксированные расценки без скрытых платежей</li>
-                <li>Оплата только за фактически выполненные работы</li>
-              </ul>
+            <div className="bg-black/30 border-l-4 border-orange-500 p-6 rounded shadow-lg flex flex-col">
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-orange-400 mb-4">2. Повышение качества</h3>
+                <p className="text-orange-100/90">
+                  Наша компания имеет опыт в подборе и обучении линейного персонала. Мы гарантируем,
+                  что вы получите квалифицированных и мотивированных сотрудников.
+                </p>
+              </div>
+              
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-orange-400 mb-4">3. Гибкость</h3>
+                <p className="text-orange-100/90">
+                  Аутсорсинг позволяет быстро адаптироваться к изменениям на рынке. Вы можете
+                  увеличивать или уменьшать численность персонала в зависимости от потребностей
+                  вашего бизнеса.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-bold text-orange-400 mb-4">4. Снижение рисков</h3>
+                <p className="text-orange-100/90">
+                  Передавая управление персоналом на аутсорсинг, вы снижаете риски, связанные с
+                  трудовым законодательством и управлением кадрами.
+                </p>
+              </div>
             </div>
-            
-            <div className="bg-black/30 border-l-4 border-orange-500 p-6 rounded shadow-lg">
-              <h3 className="text-xl font-bold text-orange-400 mb-4">Гибкость и надежность</h3>
-              <ul className="list-disc ml-6 text-orange-100/90 space-y-2">
-                <li>Быстрая мобилизация бригад под проект</li>
-                <li>Срочная замена специалистов при необходимости</li>
-                <li>Масштабирование команды под объем работ</li>
-                <li>Официальное оформление взаимоотношений</li>
-                <li>Полная материальная ответственность</li>
-              </ul>
-            </div>
+          </div>
+          
+          <div className="bg-black/30 border-l-4 border-orange-500 p-6 rounded shadow-lg">
+            <h3 className="text-xl font-bold text-orange-400 mb-4">Информация о наших сотрудниках</h3>
+            <p className="text-orange-100/90 mb-4">
+              При найме сотрудников, мы учитываем их гражданство и наличие разрешений на работу в
+              Российской Федерации.
+            </p>
+            <ul className="list-disc ml-6 text-orange-100/90 space-y-2">
+              <li>Граждане РФ: имеют право на трудоустройство без дополнительных разрешений.</li>
+              <li>Граждане Республики Беларусь (РБ) и Кыргызстан: могут работать в России без
+              разрешения на работу благодаря соглашению о Союзном государстве.</li>
+              <li>Граждане стран СНГ: с разрешениями на работу, в зависимости от конкретной
+              страны и условий миграционного законодательства.</li>
+            </ul>
           </div>
         </div>
       </section>
