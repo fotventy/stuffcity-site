@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useRef } from "react";
 
 export default function ContactsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -10,6 +10,8 @@ export default function ContactsPage() {
     type: "success" | "error" | null;
     message: string;
   }>({ type: null, message: "" });
+  
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -18,20 +20,30 @@ export default function ContactsPage() {
 
     try {
       const formData = new FormData(event.currentTarget);
-      const response = await fetch("/api/submit-form", {
+      const response = await fetch("/api/lead-to-bitrix", {
         method: "POST",
         body: formData,
       });
 
       const data = await response.json();
       
-      if (response.ok) {
+      // Логируем ответ для отладки
+      console.log("API Response:", { 
+        status: response.status, 
+        ok: response.ok,
+        data 
+      });
+      
+      // Проверяем, что ответ успешный И содержит поле success: true
+      if (response.ok && data && data.success === true) {
         setFormStatus({
           type: "success",
           message: data.message || "Заявка успешно отправлена!",
         });
-        // Очищаем форму при успешной отправке
-        event.currentTarget.reset();
+        // Безопасно сбрасываем форму через ref
+        if (formRef.current) {
+          formRef.current.reset();
+        }
       } else {
         setFormStatus({
           type: "error",
@@ -39,6 +51,7 @@ export default function ContactsPage() {
         });
       }
     } catch (error) {
+      console.error("Form submission error:", error);
       setFormStatus({
         type: "error",
         message: "Произошла ошибка при отправке формы",
@@ -76,7 +89,7 @@ export default function ContactsPage() {
               </div>
             )}
             
-            <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+            <form className="flex flex-col gap-5" onSubmit={handleSubmit} ref={formRef}>
               <div className="grid sm:grid-cols-2 gap-5">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-orange-300 mb-1">Ваше имя *</label>

@@ -11,6 +11,7 @@ export default function LeadCapture() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Проверяем, был ли попап закрыт в этой сессии
   useEffect(() => {
@@ -61,13 +62,43 @@ export default function LeadCapture() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const lead = { name, email, phone, company, date: new Date().toISOString() };
-    const leads = JSON.parse(localStorage.getItem("leads") || "[]");
-    leads.push(lead);
-    localStorage.setItem("leads", JSON.stringify(leads));
-    setSubmitted(true);
-    setLoading(false);
+    setError(null);
+    
+    try {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('phone', phone);
+      formData.append('company', company);
+      formData.append('service', 'Всплывающая форма');
+      formData.append('message', 'Запрос консультации через всплывающую форму');
+      
+      const response = await fetch("/api/lead-to-bitrix", {
+        method: "POST",
+        body: formData,
+      });
+      
+      const data = await response.json();
+      
+      // Логируем ответ для отладки
+      console.log("API Response:", { 
+        status: response.status, 
+        ok: response.ok,
+        data 
+      });
+      
+      // Проверяем ответ от API
+      if (response.ok && data && data.success === true) {
+        setSubmitted(true);
+      } else {
+        setError(data?.message || "Произошла ошибка при отправке формы");
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setError("Произошла ошибка при отправке формы");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -96,6 +127,12 @@ export default function LeadCapture() {
             <>
               <h2 className="text-2xl font-bold text-orange-500 mb-3">Получите бесплатную консультацию</h2>
               <p className="text-orange-100/80 mb-6">Заполните форму, и наш специалист свяжется с вами в течение 30 минут.</p>
+              
+              {error && (
+                <div className="p-3 bg-red-500/20 text-red-200 rounded mb-4">
+                  {error}
+                </div>
+              )}
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
