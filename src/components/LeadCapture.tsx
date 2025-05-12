@@ -38,23 +38,19 @@ export default function LeadCapture() {
     window.addEventListener("scroll", handleScroll);
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 15000);
+    }, 30000); // 30 секунд для всех посетителей
     return () => {
       window.removeEventListener("scroll", handleScroll);
       clearTimeout(timer);
     };
   }, [isVisible, isClosed]);
 
-  // Проверить, был ли посетитель на сайте ранее
+  // Удаляем старую логику для повторных посетителей
   useEffect(() => {
     if (isClosed) return;
     const hasVisited = localStorage.getItem("hasVisited");
     if (!hasVisited) {
       localStorage.setItem("hasVisited", "true");
-    } else {
-      setTimeout(() => {
-        setIsVisible(true);
-      }, 5000);
     }
   }, [isClosed]);
 
