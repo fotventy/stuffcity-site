@@ -148,6 +148,7 @@ export default function Chatbot() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [showServiceButtons, setShowServiceButtons] = useState(false);
+  const [isFirstMessage, setIsFirstMessage] = useState(true);
   
   console.log('Инициализация состояния формы:', formData);
   
@@ -161,13 +162,22 @@ export default function Chatbot() {
         sessionStorage.setItem("chatShown", "true");
         
         // Отправляем приветственное сообщение
-        handleBotReply("Здравствуйте! Меня зовут Алекс, я виртуальный помощник СтаффСити. Готов помочь вам с подбором персонала для вашего бизнеса. Как я могу к вам обращаться?");
+        handleBotReply("Здравствуйте! Я Алекс, менеджер СтаффСити. Как я могу к вам обращаться?");
         setDialogStage(DialogStage.ASK_NAME);
       }, 15000); // 15 секунд
       
       return () => clearTimeout(timer);
     }
   }, []);
+  
+  // Обработка первого сообщения при открытии чата
+  useEffect(() => {
+    if (isOpen && isFirstMessage && messages.length === 0) {
+      setIsFirstMessage(false);
+      handleBotReply("Здравствуйте! Я Алекс, менеджер СтаффСити. Как я могу к вам обращаться?");
+      setDialogStage(DialogStage.ASK_NAME);
+    }
+  }, [isOpen, isFirstMessage, messages.length]);
   
   // Прокрутка к последнему сообщению
   useEffect(() => {
@@ -366,6 +376,12 @@ export default function Chatbot() {
       // Проверяем, не является ли ввод телефоном
       const isPhoneNumber = /^\+?\d[\d\s-]{8,}$/.test(userInput.trim());
       
+      // Если это первое сообщение и это приветствие, пропускаем отправку в API
+      if (isFirstMessage && isGreeting(userInput)) {
+        setIsFirstMessage(false);
+        return;
+      }
+
       // Проверяем наличие ключевых слов заказа
       const orderKeywords = ['нужен', 'нужны', 'требуется', 'требуются', 'ищу', 'нужно', 'надо'];
       const personnelTypes = ['грузчик', 'грузчики', 'разнорабочие', 'монтажник', 'монтажники', 'такелажник', 'такелажники'];
@@ -498,7 +514,8 @@ export default function Chatbot() {
               role: msg.sender === 'bot' ? 'assistant' : 'user',
               text: msg.text
             })),
-            formData
+            formData,
+            isFirstMessage: false // Добавляем флаг в контекст
           }
         })
       });
