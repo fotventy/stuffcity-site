@@ -1,10 +1,34 @@
 // API-маршрут для обращения к Yandex GPT API
+
+// Добавляем интерфейсы для типизации
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  text: string;
+}
+
+interface ChatContext {
+  previousMessages?: ChatMessage[];
+  formData?: {
+    name?: string;
+    phone?: string;
+    company?: string;
+    service?: string;
+    message?: string;
+  };
+  isFirstMessage?: boolean;
+}
+
+interface RequestBody {
+  message: string;
+  context?: ChatContext;
+}
+
 export async function POST(request: Request) {
   console.log("=== Начало обработки запроса ===");
   console.log("Время запроса:", new Date().toISOString());
   
   try {
-    const body = await request.json();
+    const body = await request.json() as RequestBody;
     console.log("Тело запроса:", {
       messageLength: body.message?.length,
       contextExists: !!body.context,
@@ -112,7 +136,7 @@ formContext.service = "2 грузчика"
           role: "system",
           text: systemPrompt
         },
-        ...previousMessages.slice(-5).map(msg => ({
+        ...previousMessages.slice(-5).map((msg: ChatMessage) => ({
           role: msg.role,
           text: msg.text
         })),
