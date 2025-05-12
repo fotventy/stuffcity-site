@@ -70,7 +70,7 @@ export default function Home() {
               
               <div className="bg-orange-950/20 p-4 rounded mb-4">
                 <h4 className="font-bold text-orange-300 mb-2">Пример расходов при найме сотрудника:</h4>
-                <ul className="list-disc ml-6 text-orange-100/90 space-y-2">
+              <ul className="list-disc ml-6 text-orange-100/90 space-y-2">
                   <li>Оклад сотрудника: 150 000 рублей</li>
                   <li>Страховые взносы (30%): 45 000 рублей</li>
                   <li>Зарплатный проект: 5 000 рублей</li>
@@ -79,7 +79,7 @@ export default function Home() {
                   <li>Зарплата HR-менеджера: 100 000 рублей</li>
                   <li>Спецодежда: 10 000 рублей</li>
                   <li>Оплата больничных и отпускных</li>
-                </ul>
+              </ul>
                 <p className="text-orange-300 font-bold mt-4">Средняя сумма затрат на сотрудника: 250 000 руб.</p>
               </div>
               
@@ -115,21 +115,21 @@ export default function Home() {
                 </p>
               </div>
             </div>
-          </div>
-          
-          <div className="bg-black/30 border-l-4 border-orange-500 p-6 rounded shadow-lg">
+            </div>
+            
+            <div className="bg-black/30 border-l-4 border-orange-500 p-6 rounded shadow-lg">
             <h3 className="text-xl font-bold text-orange-400 mb-4">Информация о наших сотрудниках</h3>
             <p className="text-orange-100/90 mb-4">
               При найме сотрудников, мы учитываем их гражданство и наличие разрешений на работу в
               Российской Федерации.
             </p>
-            <ul className="list-disc ml-6 text-orange-100/90 space-y-2">
+              <ul className="list-disc ml-6 text-orange-100/90 space-y-2">
               <li>Граждане РФ: имеют право на трудоустройство без дополнительных разрешений.</li>
               <li>Граждане Республики Беларусь (РБ) и Кыргызстан: могут работать в России без
               разрешения на работу благодаря соглашению о Союзном государстве.</li>
               <li>Граждане стран СНГ: с разрешениями на работу, в зависимости от конкретной
               страны и условий миграционного законодательства.</li>
-            </ul>
+              </ul>
           </div>
         </div>
       </section>

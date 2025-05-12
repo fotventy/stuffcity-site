@@ -87,7 +87,7 @@ export default function LeadCapture() {
       
       // Проверяем ответ от API
       if (response.ok && data && data.success === true) {
-        setSubmitted(true);
+    setSubmitted(true);
       } else {
         setError(data?.message || "Произошла ошибка при отправке формы");
       }
@@ -95,7 +95,7 @@ export default function LeadCapture() {
       console.error("Form submission error:", error);
       setError("Произошла ошибка при отправке формы");
     } finally {
-      setLoading(false);
+    setLoading(false);
     }
   };
 

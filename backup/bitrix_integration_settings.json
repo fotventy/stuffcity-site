@@ -1,0 +1,28 @@
+{
+  "BITRIX_WEBHOOK_URL": "https://b24-jm4e2n.bitrix24.ru/rest/1/3nlvbgee8zh8hfp7/crm.lead.add.json",
+  "INTEGRATION_CONFIG": {
+    "fields": {
+      "TITLE": "Заявка с сайта от ${name}",
+      "NAME": "${name}",
+      "COMPANY_TITLE": "${company || ''}",
+      "EMAIL": [{ "VALUE": "${email}", "VALUE_TYPE": "WORK" }],
+      "PHONE": [{ "VALUE": "${phone}", "VALUE_TYPE": "WORK" }],
+      "COMMENTS": "Услуга: ${service || 'Не указана'}\n\nСообщение: ${message || 'Не указано'}",
+      "SOURCE_ID": "WEB",
+      "SOURCE_DESCRIPTION": "Заявка с сайта СтаффСити",
+      "ASSIGNED_BY_ID": 1
+    },
+    "params": {
+      "REGISTER_SONET_EVENT": "Y"
+    }
+  },
+  "API_ENDPOINT": "/api/lead-to-bitrix",
+  "FORM_FIELDS": {
+    "required": ["name", "email", "phone"],
+    "optional": ["company", "service", "message"]
+  },
+  "FORMS_USING_INTEGRATION": [
+    "src/app/contacts/page.tsx",
+    "src/components/LeadCapture.tsx"
+  ]
+} 

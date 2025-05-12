@@ -114,16 +114,16 @@ export default function ContactsPage() {
                 </div>
               </div>
               
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-orange-300 mb-1">Телефон *</label>
-                <input 
-                  type="tel" 
-                  id="phone" 
-                  name="phone"
-                  placeholder="+7 (999) 999-99-99" 
-                  className="w-full p-3 rounded bg-black/50 border border-orange-500/30 text-white placeholder:text-orange-100/50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" 
-                  required 
-                />
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-orange-300 mb-1">Телефон *</label>
+                  <input 
+                    type="tel" 
+                    id="phone" 
+                    name="phone"
+                    placeholder="+7 (999) 999-99-99" 
+                    className="w-full p-3 rounded bg-black/50 border border-orange-500/30 text-white placeholder:text-orange-100/50 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" 
+                    required 
+                  />
               </div>
               
               <div>
