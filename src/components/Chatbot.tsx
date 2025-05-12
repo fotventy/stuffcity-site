@@ -367,31 +367,67 @@ export default function Chatbot() {
         const response = lastUserMessage.toLowerCase();
         if (response.includes('да') || response.includes('верно') || response.includes('отправить')) {
           submitForm();
+        } else if (response.includes('не верно') || response.includes('неверно') || response.includes('нет') || 
+                  response.includes('изменить') || response.includes('исправить') || response.includes('не так')) {
+          // Проверяем, что конкретно нужно изменить
+          if (response.includes('имя')) {
+            handleBotReply("Хорошо, как я могу к вам обращаться?");
+            setDialogStage(DialogStage.ASK_NAME);
+          } else if (response.includes('телефон')) {
+            handleBotReply("Пожалуйста, укажите новый номер телефона в формате +7 или 8 (XXX) XXX-XX-XX.");
+            setDialogStage(DialogStage.ASK_PHONE);
+          } else if (response.includes('компани')) {
+            handleBotReply("Укажите, пожалуйста, новое название компании.");
+            setDialogStage(DialogStage.ASK_COMPANY);
+          } else if (response.includes('услуг') || response.includes('персонал')) {
+            handleBotReply("Какой тип персонала вас интересует? Выберите из списка или укажите свой вариант.");
+            setShowServiceButtons(true);
+            setDialogStage(DialogStage.ASK_SERVICE);
+          } else if (response.includes('сообщени') || response.includes('задач') || response.includes('проект')) {
+            handleBotReply("Расскажите подробнее о вашем проекте или задаче.");
+            setDialogStage(DialogStage.ASK_MESSAGE);
+          } else {
+            handleBotReply("Что именно вы хотите изменить? (имя, телефон, компанию, услугу или описание задачи)");
+          }
         } else {
-          handleBotReply("Хорошо, давайте исправим данные. Напишите, что именно нужно изменить, или просто задайте любой вопрос, и я постараюсь помочь.");
-          setDialogStage(DialogStage.FREE_CHAT);
+          handleBotReply("Пожалуйста, подтвердите отправку заявки словом 'да' или уточните, что именно нужно изменить (например, 'изменить имя').");
         }
         break;
         
       case DialogStage.FREE_CHAT:
         const lowerMessage = lastUserMessage.toLowerCase();
-        if (lowerMessage.includes('измени') || lowerMessage.includes('исправь')) {
-          if (lowerMessage.includes('имя')) {
+        // Расширенная проверка на запрос изменения
+        const wantsToChange = 
+          lowerMessage.includes('измен') || 
+          lowerMessage.includes('исправ') || 
+          lowerMessage.includes('другое') || 
+          lowerMessage.includes('не верно') || 
+          lowerMessage.includes('неверно') || 
+          lowerMessage.includes('не так') ||
+          lowerMessage.includes('не правильно') ||
+          lowerMessage.includes('неправильно');
+          
+        if (wantsToChange) {
+          if (lowerMessage.includes('имя') || lowerMessage.includes('как меня') || lowerMessage.includes('называть')) {
             handleBotReply("Хорошо, как я могу к вам обращаться?");
             setDialogStage(DialogStage.ASK_NAME);
-          } else if (lowerMessage.includes('телефон')) {
+          } else if (lowerMessage.includes('телефон') || lowerMessage.includes('номер')) {
             handleBotReply("Пожалуйста, укажите новый номер телефона в формате +7 или 8 (XXX) XXX-XX-XX.");
             setDialogStage(DialogStage.ASK_PHONE);
-          } else if (lowerMessage.includes('компани')) {
+          } else if (lowerMessage.includes('компани') || lowerMessage.includes('организац') || lowerMessage.includes('фирм')) {
             handleBotReply("Укажите, пожалуйста, новое название компании.");
             setDialogStage(DialogStage.ASK_COMPANY);
-          } else if (lowerMessage.includes('услуг')) {
+          } else if (lowerMessage.includes('услуг') || lowerMessage.includes('специалист') || lowerMessage.includes('персонал') || lowerMessage.includes('работник')) {
             handleBotReply("Какой тип персонала вас интересует? Выберите из списка или укажите свой вариант.");
             setShowServiceButtons(true);
             setDialogStage(DialogStage.ASK_SERVICE);
-          } else if (lowerMessage.includes('сообщени') || lowerMessage.includes('описани')) {
+          } else if (lowerMessage.includes('сообщени') || lowerMessage.includes('описани') || lowerMessage.includes('задач') || lowerMessage.includes('проект') || lowerMessage.includes('детал')) {
             handleBotReply("Расскажите подробнее о вашем проекте или задаче.");
             setDialogStage(DialogStage.ASK_MESSAGE);
+          } else if (lowerMessage.includes('все') || lowerMessage.includes('данные') || lowerMessage.includes('заявку')) {
+            // Запрос на изменение всей заявки - начинаем с имени
+            handleBotReply("Хорошо, давайте заполним заявку заново. Как я могу к вам обращаться?");
+            setDialogStage(DialogStage.ASK_NAME);
           } else {
             handleBotReply("Что именно вы хотите изменить? (имя, телефон, компанию, услугу или описание задачи)");
           }
