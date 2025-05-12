@@ -132,6 +132,37 @@ const isPossiblyName = (input: string): boolean => {
   return true;
 };
 
+// Добавим функцию валидации имени
+const isValidName = (name: string): boolean => {
+  // Имя должно быть от 2 до 50 символов
+  if (name.length < 2 || name.length > 50) return false;
+  
+  // Имя должно содержать только буквы, пробелы и дефисы
+  const nameRegex = /^[а-яА-ЯёЁa-zA-Z\s-]+$/;
+  if (!nameRegex.test(name)) return false;
+  
+  // Имя не должно содержать только пробелы или дефисы
+  if (name.trim().length === 0) return false;
+  
+  return true;
+};
+
+// Добавим функцию для определения типа сообщения
+const getMessageType = (message: string): 'greeting' | 'name' | 'other' => {
+  const greetings = ['привет', 'здравствуйте', 'добрый день', 'доброе утро', 'добрый вечер', 'хай', 'hello', 'hi'];
+  const lowercaseMessage = message.toLowerCase().trim();
+  
+  if (greetings.some(greeting => lowercaseMessage.includes(greeting))) {
+    return 'greeting';
+  }
+  
+  if (isValidName(message)) {
+    return 'name';
+  }
+  
+  return 'other';
+};
+
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -162,7 +193,7 @@ export default function Chatbot() {
         sessionStorage.setItem("chatShown", "true");
         
         // Отправляем приветственное сообщение
-        handleBotReply("Здравствуйте! Я Алекс, менеджер СтаффСити. Как я могу к вам обращаться?");
+        handleBotReply("Здравствуйте! Я Алекс, менеджер СтаффСити. Напишите что-нибудь, и я помогу вам подобрать персонал.");
         setDialogStage(DialogStage.ASK_NAME);
       }, 15000); // 15 секунд
       
@@ -170,12 +201,11 @@ export default function Chatbot() {
     }
   }, []);
   
-  // Обработка первого сообщения при открытии чата
+  // Изменим обработку первого сообщения
   useEffect(() => {
     if (isOpen && isFirstMessage && messages.length === 0) {
       setIsFirstMessage(false);
-      handleBotReply("Здравствуйте! Я Алекс, менеджер СтаффСити. Как я могу к вам обращаться?");
-      setDialogStage(DialogStage.ASK_NAME);
+      handleBotReply("Здравствуйте! Я Алекс, менеджер СтаффСити. Напишите что-нибудь, и я помогу вам подобрать персонал.");
     }
   }, [isOpen, isFirstMessage, messages.length]);
   
@@ -184,22 +214,40 @@ export default function Chatbot() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Обработка ответа пользователя в зависимости от стадии диалога
+  // Обновим обработку ответа пользователя
   useEffect(() => {
     if (messages.length === 0 || messages[messages.length - 1].sender === 'bot') return;
     
     const lastUserMessage = messages[messages.length - 1].text;
     
     switch (dialogStage) {
+      case DialogStage.INITIAL:
+        const messageType = getMessageType(lastUserMessage);
+        if (messageType === 'greeting' || messageType === 'other') {
+          handleBotReply("Как я могу к вам обращаться?");
+          setDialogStage(DialogStage.ASK_NAME);
+        } else if (messageType === 'name') {
+          const formattedName = lastUserMessage.trim()
+            .split(/\s+/)
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+          setFormData(prev => ({ ...prev, name: formattedName }));
+          handleBotReply(`Приятно познакомиться, ${formattedName}! Для того чтобы мы могли с вами связаться, оставьте, пожалуйста, номер телефона в формате +7 или 8 (XXX) XXX-XX-XX.`);
+          setDialogStage(DialogStage.ASK_PHONE);
+        }
+        break;
+        
       case DialogStage.ASK_NAME:
-        if (lastUserMessage.length > 1) {
-          setFormData(prev => ({ ...prev, name: lastUserMessage }));
-          setTimeout(() => {
-            handleBotReply(`Приятно познакомиться, ${lastUserMessage}! Для того чтобы мы могли с вами связаться, оставьте, пожалуйста, номер телефона в формате +7 или 8 (XXX) XXX-XX-XX.`);
-            setDialogStage(DialogStage.ASK_PHONE);
-          }, 1000);
+        if (!isValidName(lastUserMessage)) {
+          handleBotReply("Пожалуйста, укажите корректное имя (только буквы, пробелы и дефисы).");
         } else {
-          handleBotReply("Кажется, ваше имя слишком короткое. Пожалуйста, укажите ваше полное имя.");
+          const formattedName = lastUserMessage.trim()
+            .split(/\s+/)
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+          setFormData(prev => ({ ...prev, name: formattedName }));
+          handleBotReply(`Приятно познакомиться, ${formattedName}! Для того чтобы мы могли с вами связаться, оставьте, пожалуйста, номер телефона в формате +7 или 8 (XXX) XXX-XX-XX.`);
+          setDialogStage(DialogStage.ASK_PHONE);
         }
         break;
         
@@ -279,7 +327,36 @@ export default function Chatbot() {
         break;
         
       case DialogStage.FREE_CHAT:
-        handleUserQuestion(lastUserMessage);
+        const lowerMessage = lastUserMessage.toLowerCase();
+        if (lowerMessage.includes('измени') || lowerMessage.includes('исправь')) {
+          if (lowerMessage.includes('имя')) {
+            handleBotReply("Хорошо, как я могу к вам обращаться?");
+            setDialogStage(DialogStage.ASK_NAME);
+          } else if (lowerMessage.includes('телефон')) {
+            handleBotReply("Пожалуйста, укажите новый номер телефона в формате +7 или 8 (XXX) XXX-XX-XX.");
+            setDialogStage(DialogStage.ASK_PHONE);
+          } else if (lowerMessage.includes('компани')) {
+            handleBotReply("Укажите, пожалуйста, новое название компании.");
+            setDialogStage(DialogStage.ASK_COMPANY);
+          } else if (lowerMessage.includes('услуг')) {
+            handleBotReply("Какой тип персонала вас интересует? Выберите из списка или укажите свой вариант.");
+            setShowServiceButtons(true);
+            setDialogStage(DialogStage.ASK_SERVICE);
+          } else if (lowerMessage.includes('сообщени') || lowerMessage.includes('описани')) {
+            handleBotReply("Расскажите подробнее о вашем проекте или задаче.");
+            setDialogStage(DialogStage.ASK_MESSAGE);
+          } else {
+            handleBotReply("Что именно вы хотите изменить? (имя, телефон, компанию, услугу или описание задачи)");
+          }
+        } else {
+          // Пытаемся обработать сообщение как новый запрос
+          const messageType = getMessageType(lastUserMessage);
+          if (messageType === 'name') {
+            handleBotReply("Хотите изменить имя? Просто напишите 'изменить имя'.");
+          } else {
+            handleBotReply("Я могу помочь изменить данные заявки. Что вы хотите изменить: имя, телефон, компанию, услугу или описание задачи?");
+          }
+        }
         break;
         
       default:
