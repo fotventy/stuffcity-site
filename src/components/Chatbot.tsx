@@ -192,20 +192,19 @@ export default function Chatbot() {
         setIsOpen(true);
         sessionStorage.setItem("chatShown", "true");
         
-        // Отправляем приветственное сообщение
-        handleBotReply("Здравствуйте! Я Алекс, менеджер СтаффСити. Напишите что-нибудь, и я помогу вам подобрать персонал.");
-        setDialogStage(DialogStage.ASK_NAME);
+        // Удаляем автоматическую отправку первого сообщения
+        // Теперь бот будет ждать сообщения от пользователя
       }, 15000); // 15 секунд
       
       return () => clearTimeout(timer);
     }
   }, []);
   
-  // Изменим обработку первого сообщения
+  // Удаляем автоматическую отправку первого сообщения при открытии чата
   useEffect(() => {
     if (isOpen && isFirstMessage && messages.length === 0) {
       setIsFirstMessage(false);
-      handleBotReply("Здравствуйте! Я Алекс, менеджер СтаффСити. Напишите что-нибудь, и я помогу вам подобрать персонал.");
+      // Удаляем автоматическую отправку сообщения от бота
     }
   }, [isOpen, isFirstMessage, messages.length]);
   
@@ -220,6 +219,54 @@ export default function Chatbot() {
     
     const lastUserMessage = messages[messages.length - 1].text;
     
+    // Проверяем, является ли сообщение часто задаваемым вопросом
+    const handleFAQ = () => {
+      if (lastUserMessage === "Как быстро можно получить сотрудников?") {
+        handleBotReply("Мы можем организовать команду в течение 24-48 часов после подписания договора. Хотите оставить заявку, чтобы наш менеджер связался с вами?");
+        return true;
+      } else if (lastUserMessage === "Какие специальности доступны?") {
+        handleBotReply("Мы предоставляем разнорабочих, грузчиков, монтажников, сварщиков, монолитчиков, сантехников, отделочников и многих других. Какая специальность вас интересует?");
+        return true;
+      } else if (lastUserMessage === "Сколько стоят ваши услуги?") {
+        handleBotReply("Стоимость наших услуг зависит от специализации и количества требуемых сотрудников. Оставьте заявку на консультацию, и наш менеджер рассчитает для вас индивидуальное предложение. Хотите оформить заявку?");
+        return true;
+      } else if (lastUserMessage === "Работаете ли вы с юридическими лицами?") {
+        handleBotReply("Да, мы специализируемся на работе именно с юридическими лицами по договору B2B. Какой персонал вам требуется?");
+        return true;
+      }
+      return false;
+    };
+    
+    // Если сообщение - часто задаваемый вопрос, обрабатываем и выходим
+    if (handleFAQ()) return;
+    
+    // Если это первое сообщение в чате от пользователя
+    if (messages.length === 1 && messages[0].sender === 'user') {
+      // Приветствуем пользователя
+      const messageType = getMessageType(lastUserMessage);
+      
+      if (messageType === 'greeting') {
+        handleBotReply("Здравствуйте! Я Алекс, менеджер СтаффСити. Как я могу к вам обращаться?");
+        setDialogStage(DialogStage.ASK_NAME);
+        return;
+      } else if (messageType === 'name') {
+        const formattedName = lastUserMessage.trim()
+          .split(/\s+/)
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ');
+        setFormData(prev => ({ ...prev, name: formattedName }));
+        handleBotReply(`Приятно познакомиться, ${formattedName}! Для того чтобы мы могли с вами связаться, оставьте, пожалуйста, номер телефона в формате +7 или 8 (XXX) XXX-XX-XX.`);
+        setDialogStage(DialogStage.ASK_PHONE);
+        return;
+      } else {
+        // Если первое сообщение не приветствие и не имя, просто спрашиваем имя
+        handleBotReply("Здравствуйте! Я Алекс, менеджер СтаффСити. Как я могу к вам обращаться?");
+        setDialogStage(DialogStage.ASK_NAME);
+        return;
+      }
+    }
+    
+    // Далее обычная логика обработки сообщений по стадиям диалога
     switch (dialogStage) {
       case DialogStage.INITIAL:
         const messageType = getMessageType(lastUserMessage);
@@ -627,18 +674,7 @@ export default function Chatbot() {
       }
     ]);
     
-    // Имитируем ответ бота
-    setTimeout(() => {
-      if (question === "Как быстро можно получить сотрудников?") {
-        handleBotReply("Мы можем организовать команду в течение 24-48 часов после подписания договора. Хотите оставить заявку, чтобы наш менеджер связался с вами?");
-      } else if (question === "Какие специальности доступны?") {
-        handleBotReply("Мы предоставляем разнорабочих, грузчиков, монтажников, сварщиков, монолитчиков, сантехников, отделочников и многих других. Какая специальность вас интересует?");
-      } else if (question === "Сколько стоят ваши услуги?") {
-        handleBotReply("Стоимость наших услуг зависит от специализации и количества требуемых сотрудников. Оставьте заявку на консультацию, и наш менеджер рассчитает для вас индивидуальное предложение. Хотите оформить заявку?");
-      } else if (question === "Работаете ли вы с юридическими лицами?") {
-        handleBotReply("Да, мы специализируемся на работе именно с юридическими лицами по договору B2B. Какой персонал вам требуется?");
-      }
-    }, 500);
+    // Отключаем автоматический ответ, так как он будет обработан в useEffect для обработки сообщений
   };
   
   const submitForm = async () => {
@@ -812,7 +848,7 @@ export default function Chatbot() {
               </svg>
             </div>
             <h4 className="text-orange-500 font-bold text-lg mb-2">Онлайн-консультант</h4>
-            <p className="text-orange-100/80 text-sm">Я помогу вам подобрать персонал для вашего бизнеса</p>
+            <p className="text-orange-100/80 text-sm">Напишите мне, и я помогу подобрать персонал для вашего бизнеса</p>
             
             <div className="mt-4 w-full">
               <h5 className="text-sm font-medium text-orange-500 mb-2">Часто задаваемые вопросы:</h5>
